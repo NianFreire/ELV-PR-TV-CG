@@ -1,0 +1,48 @@
+Sistemas inseridos no programa de contribuição de grupos
+
+Dióxido de carbono + metanol
+Dióxido de carbono + etanol
+Dióxido de carbono + butano
+Dióxido de carbono + pentano
+Dióxido de carbono + hexano
+Dióxido de carbono + heptano
+Dióxido de carbono + octacosano
+Dióxido de carbono + caproato de etila
+Dióxido de carbono + caprilato de etila
+Dióxido de carbono + caprato de etila
+Dióxido de carbono + laurato de etila
+Dióxido de carbono + miristato de metila
+Dióxido de carbono + palmitato de metila
+Dióxido de carbono + estearato de metila
+Dióxido de carbono + estearato de etila
+Dióxido de carbono + oleato de metila
+Dióxido de carbono + oleato de etila
+Dióxido de carbono + linoleato de metila
+Dióxido de carbono + linoleato de etila
+Dióxido de carbono + tricaprilina
+Metanol + etanol
+Metanol + glicerol
+Metanol + laurato de metila
+Metanol + miristato de metila
+Metanol + palmitato de metila
+Metanol + trioleína
+Etanol + água
+Etanol + hexano
+Etanol + heptano
+Etanol + benzeno
+Etanol + glicerol
+Etanol + laurato de etila
+Etanol + miristato de etila
+Caproato de metila + caprilato de metila
+Caprilato de metila + caprato de metila
+Caprato de metila + laurato de metila
+Laurato de metila + miristato de metila
+Miristato de metila + palmitato de metila
+Miristato de etila + palmitato de etila
+Caproato de etila + tetradecano
+Caprilato de etila + dodecano
+Caprato de etila + tetradecano
+Laurato de etila + dodecano
+Miristato de etila + tetradecano
+
+

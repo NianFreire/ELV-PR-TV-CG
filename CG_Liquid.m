@@ -1,0 +1,582 @@
+function [gamma1,gamma2,Ge1_l,Ge2_l,Gm1R_l,Gm2R_l] = CG_Liquid(x1,Tdata,g1,g2,n1,n2,Ng1,Ng2,R,N,M)
+QkCH3=1.2958;
+QkCH2=0.9471;
+QkCH=0.2629;
+QkCHd=1.3221;
+QkOHp=1.0189;
+QkOHs=0.9326;
+QkCH3OH=0.8779;
+QkH2O=1.5576;
+QkCH3CO=1.448;
+QkCH2COO=1.42;
+QkCO2=0.982;
+QkIM_Tf2N=392;
+QkIM_PF6=4.098;
+QkIM_BF4=5.983;
+RkCH3=0.6325;
+RkCH2=0.6325;
+RkCH=0.6325;
+RkCHd=1.2832;
+RkOHp=1.2302;
+RkOHs=1.0630;
+RkCH3OH=0.8585;
+RkH2O=1.7334;
+RkCH3CO=1.7048;
+RkCH2COO=1.27;
+RkCO2=1;
+RkIM_Tf2N=3145;
+RkIM_PF6=4.179;
+RkIM_BF4=6.5494;
+%1=CH
+%2=Cd
+%3=OH
+%4=CH3OH
+%5=H2O
+%6=CHCO
+%7=CHCOO
+%8=CO2
+%9=IM-Tf2N
+%10=IM-PF6
+%11=IM-BF4
+q1=n1(1)*QkCH3+n1(2).*QkCH2+n1(3).*QkCH+n1(4).*QkCHd+n1(5).*QkOHp+n1(6).*QkOHs+n1(7).*QkCH3OH+n1(8).*QkH2O+n1(9).*QkCH3CO+n1(10).*QkCH2COO+n1(11).*QkCO2+n1(12).*QkIM_Tf2N+n1(13).*QkIM_PF6+n1(14).*QkIM_BF4;
+q2=n2(1)*QkCH3+n2(2).*QkCH2+n2(3).*QkCH+n2(4).*QkCHd+n2(5).*QkOHp+n2(6).*QkOHs+n2(7).*QkCH3OH+n2(8).*QkH2O+n2(9).*QkCH3CO+n2(10).*QkCH2COO+n2(11).*QkCO2+n2(12).*QkIM_Tf2N+n2(13).*QkIM_PF6+n2(14).*QkIM_BF4;
+r1=n1(1)*RkCH3+n1(2).*RkCH2+n1(3).*RkCH+n1(4).*RkCHd+n1(5).*RkOHp+n1(6).*RkOHs+n1(7).*RkCH3OH+n1(8).*RkH2O+n1(9).*RkCH3CO+n1(10).*RkCH2COO+n1(11).*RkCO2+n1(12).*RkIM_Tf2N+n1(13).*RkIM_PF6+n1(14).*RkIM_BF4;
+r2=n2(1)*RkCH3+n2(2).*RkCH2+n2(3).*RkCH+n2(4).*RkCHd+n2(5).*RkOHp+n2(6).*RkOHs+n2(7).*RkCH3OH+n2(8).*RkH2O+n2(9).*RkCH3CO+n2(10).*RkCH2COO+n2(11).*RkCO2+n2(12).*RkIM_Tf2N+n2(13).*RkIM_PF6+n2(14).*RkIM_BF4;
+%Interações com CH
+    %C=C
+Anm_12=171.47;
+Bnm_12=-0.0432;
+Cnm_12=0;
+Amn_12=-87.609;
+Bmn_12=-0.0544;
+Cmn_12=0;
+psi1_2=exp(-(Anm_12+Bnm_12.*Tdata+Cnm_12.*Tdata.^2)/Tdata);
+psi2_1=exp(-(Amn_12+Bmn_12.*Tdata+Cmn_12.*Tdata.^2)/Tdata);
+    %OH
+%Anm_13=1809.5;
+%Bnm_13=-0.4856;
+%Cnm_13=-0.00232;
+%Amn_13=725.66;
+%Bmn_13=-0.905;
+%Cmn_13=0.003154;
+Anm_13=3457.1;
+Bnm_13=-8.4553;
+Cnm_13=0;
+Amn_13=-3461.8;
+Bmn_13=9.5529;
+Cmn_13=0;
+psi1_3=exp(-(Anm_13+Bnm_13.*Tdata+Cnm_13.*Tdata.^2)/Tdata);
+psi3_1=exp(-(Amn_13+Bmn_13.*Tdata+Cmn_13.*Tdata.^2)/Tdata);
+    %CH3OH
+Anm_14=1733.4;
+Bnm_14=1.8057;
+Cnm_14=-0.00619;
+Amn_14=50.672;
+Bmn_14=-0.6378;
+Cmn_14=0.000178;
+psi1_4=exp(-(Anm_14+Bnm_14.*Tdata+Cnm_14.*Tdata.^2)/Tdata);
+psi4_1=exp(-(Amn_14+Bmn_14.*Tdata+Cmn_14.*Tdata.^2)/Tdata);
+    %H2O
+%Anm_15=2096.9;
+%Bnm_15=-1.6565;
+%Cnm_15=0.59001;
+%Amn_15=56.588;
+%Bmn_15=0.5883;
+%Cmn_15=0.000447;
+Anm_15=6221;
+Bnm_15=-14.539;
+Cnm_15=0;
+Amn_15=3911.4;
+Bmn_15=-7.8919;
+Cmn_15=0;
+psi1_5=exp(-(Anm_15+Bnm_15.*Tdata+Cnm_15.*Tdata.^2)/Tdata);
+psi5_1=exp(-(Amn_15+Bmn_15.*Tdata+Cmn_15.*Tdata.^2)/Tdata);
+    %CHCO
+Anm_16=425.31;
+Bnm_16=0.6879;
+Cnm_16=-0.00031;
+Amn_16=284.25;
+Bmn_16=-1.7731;
+Cmn_16=0.001636;
+psi1_6=exp(-(Anm_16+Bnm_16.*Tdata+Cnm_16.*Tdata.^2)/Tdata);
+psi6_1=exp(-(Amn_16+Bmn_16.*Tdata+Cmn_16.*Tdata.^2)/Tdata);
+    %CHCOO
+Anm_17=138.56;
+Bnm_17=1.5746;
+Cnm_17=-0.002191;
+Amn_17=779.9;
+Bmn_17=-4.5744;
+Cmn_17=0.005804;
+psi1_7=exp(-(Anm_17+Bnm_17.*Tdata+Cnm_17.*Tdata.^2)/Tdata);
+psi7_1=exp(-(Amn_17+Bmn_17.*Tdata+Cmn_17.*Tdata.^2)/Tdata);
+    %CO2
+Anm_18=403.11;
+Bnm_18=-0.1999;
+Cnm_18=-0.0000668;
+Amn_18=204.83;
+Bmn_18=-1.3096;
+Cmn_18=0.001197;
+psi1_8=exp(-(Anm_18+Bnm_18.*Tdata+Cnm_18.*Tdata.^2)/Tdata);
+psi8_1=exp(-(Amn_18+Bmn_18.*Tdata+Cmn_18.*Tdata.^2)/Tdata);
+    %IM-Tf2N
+Anm_19=0;
+Bnm_19=0;
+Cnm_19=0;
+Amn_19=0;
+Bmn_19=0;
+Cmn_19=0;
+psi1_9=exp(-(Anm_19+Bnm_19.*Tdata+Cnm_19.*Tdata.^2)/Tdata);
+psi9_1=exp(-(Amn_19+Bmn_19.*Tdata+Cmn_19.*Tdata.^2)/Tdata);
+    %IM-PF6
+psi1_10=0;
+psi10_1=0;
+    %IM-BF4
+psi1_11=0;
+psi11_1=0;
+%Interações com C=C (CHd)
+    %OH
+Anm_23=756.09;
+Bnm_23=1.4097;
+Cnm_23=-0.00193;
+Amn_23=2049.9;
+Bmn_23=6.3523;
+Cmn_23=-0.00133;
+psi2_3=exp(-(Anm_23+Bnm_23.*Tdata+Cnm_23.*Tdata.^2)/Tdata);
+psi3_2=exp(-(Amn_23+Bmn_23.*Tdata+Cmn_23.*Tdata.^2)/Tdata);
+    %CH3OH
+Anm_24=3394.3;
+Bnm_24=0.1123;
+Cnm_24=0;
+Amn_24=-113.11;
+Bmn_24=0.1866;
+Cmn_24=0;
+psi2_4=exp(-(Anm_24+Bnm_24.*Tdata+Cnm_24.*Tdata.^2)/Tdata);
+psi4_2=exp(-(Amn_24+Bmn_24.*Tdata+Cmn_24.*Tdata.^2)/Tdata);
+    %H2O
+psi2_5=0;
+psi5_2=0;
+    %CHCO
+Anm_26=366.63;
+Bnm_26=-0.1551;
+Cnm_26=0;
+Amn_26=-102.95;
+Bmn_26=0.254;
+Cmn_26=0;
+psi2_6=exp(-(Anm_26+Bnm_26.*Tdata+Cnm_26.*Tdata.^2)/Tdata);
+psi6_2=exp(-(Amn_26+Bmn_26.*Tdata+Cmn_26.*Tdata.^2)/Tdata);
+    %CHCOO
+psi2_7=0;
+psi7_2=0;
+    %CO2
+Anm_28=7.9448;
+Bnm_28=0;
+Cnm_28=0;
+Amn_28=218.62;
+Bmn_28=0;
+Cmn_28=0;
+psi2_8=exp(-(Anm_28+Bnm_28.*Tdata+Cnm_28.*Tdata.^2)/Tdata);
+psi8_2=exp(-(Amn_28+Bmn_28.*Tdata+Cmn_28.*Tdata.^2)/Tdata);
+    %IM-Tf2N
+psi2_9=0;
+psi9_2=0;
+    %IM-PF6
+psi2_10=0;
+psi10_2=0;
+    %IM-BF4
+psi2_11=0;
+psi11_2=0;
+%Interações com OH
+    %CH3OH
+psi3_4=0;
+psi4_3=0;
+    %H2O
+%Anm_35=-789.48;
+%Bnm_35=2.8178;
+%Cnm_35=-0.00195;
+%Amn_35=478.28;
+%Bmn_35=-0.5389;
+%Cmn_35=-0.00204;
+Anm_35=-511.65;
+Bnm_35=1.1259;
+Cnm_35=0;
+Amn_35=2779.6;
+Bmn_35=-6.855;
+Cmn_35=0;
+psi3_5=exp(-(Anm_35+Bnm_35.*Tdata+Cnm_35.*Tdata.^2)/Tdata);
+psi5_3=exp(-(Amn_35+Bmn_35.*Tdata+Cmn_35.*Tdata.^2)/Tdata);
+    %CHCO
+Anm_36=-57.644;
+Bnm_36=0.7875;
+Cnm_36=-0.00015955;
+Amn_36=540.61;
+Bmn_36=-0.9922;
+Cmn_36=0.00035082;
+psi3_6=exp(-(Anm_36+Bnm_36.*Tdata+Cnm_36.*Tdata.^2)/Tdata);
+psi6_3=exp(-(Amn_36+Bmn_36.*Tdata+Cmn_36.*Tdata.^2)/Tdata);
+    %CHCOO
+Anm_37=-5686.9;
+Bnm_37=16.533;
+Cnm_37=0;
+Amn_37=-6179.9;
+Bmn_37=16.704;
+Cmn_37=0;
+psi3_7=exp(-(Anm_37+Bnm_37.*Tdata+Cnm_37.*Tdata.^2)/Tdata);
+psi7_3=exp(-(Amn_37+Bmn_37.*Tdata+Cmn_37.*Tdata.^2)/Tdata);
+%psi3_7=N;
+%psi7_3=M;
+    %CO2
+psi3_8=0;
+psi8_3=0;
+    %IM-Tf2N
+psi3_9=0;
+psi9_3=0;
+    %IM-PF6
+psi3_10=0;
+psi10_3=0;
+    %IM-BF4
+psi3_11=0;
+psi11_3=0;
+%Interações com CH3OH
+    %H20
+Anm_45=-387.40;
+Bnm_45=1.9621;
+Cnm_45=-0.0034336;
+Amn_45=-168.82;
+Bmn_45=0.6674;
+Cmn_45=0.0041881;
+psi4_5=exp(-(Anm_45+Bnm_45.*Tdata+Cnm_45.*Tdata.^2)/Tdata);
+psi5_4=exp(-(Amn_45+Bmn_45.*Tdata+Cmn_45.*Tdata.^2)/Tdata);
+    %CHCO
+Anm_46=143.82;
+Bnm_46=-0.7722;
+Cnm_46=0;
+Amn_46=275.58;
+Bmn_46=0.1849;
+Cmn_46=0;
+psi4_6=exp(-(Anm_46+Bnm_46.*Tdata+Cnm_46.*Tdata.^2)/Tdata);
+psi6_4=exp(-(Amn_46+Bmn_46.*Tdata+Cmn_46.*Tdata.^2)/Tdata);
+    %CHCOO
+Anm_47=-228.94297;
+Bnm_47=0.127774;
+Cnm_47=0;
+Amn_47=2277.4819;
+Bmn_47=-5.088237;
+Cmn_47=0;
+psi4_7=exp(-(Anm_47+Bnm_47.*Tdata+Cnm_47.*Tdata.^2)/Tdata);
+psi7_4=exp(-(Amn_47+Bmn_47.*Tdata+Cmn_47.*Tdata.^2)/Tdata);
+    %CO2
+Anm_48=-41.601;
+Bnm_48=0;
+Cnm_48=0;
+Amn_48=631.57;
+Bmn_48=0;
+Cmn_48=0; 
+psi4_8=exp(-(Anm_48+Bnm_48.*Tdata+Cnm_48.*Tdata.^2)/Tdata);
+psi8_4=exp(-(Amn_48+Bmn_48.*Tdata+Cmn_48.*Tdata.^2)/Tdata);
+    %IM-Tf2N
+psi4_9=0;
+psi9_4=0;
+    %IM-PF6
+psi4_10=0;
+psi10_4=0;
+    %IM-BF4
+psi4_11=0;
+psi11_4=0;
+%Interações com H2O
+    %CHCOO
+psi5_6=0;
+psi6_5=0;
+    %CHCO
+psi5_7=0;
+psi7_5=0;
+    %CO2
+Anm_58=2880.1;
+Bnm_58=132.82;
+Cnm_58=-0.31736;
+Amn_58=73.329;
+Bmn_58=1.1222;
+Cmn_58=0.001956;
+psi5_8=exp(-(Anm_58+Bnm_58.*Tdata+Cnm_58.*Tdata.^2)/Tdata);
+psi8_5=exp(-(Amn_58+Bmn_58.*Tdata+Cmn_58.*Tdata.^2)/Tdata);
+    %IM-Tf2N
+psi5_9=0;
+psi9_5=0;
+    %IM-PF6
+psi5_10=0;
+psi10_5=0;
+    %IM-BF4
+psi5_11=0;
+psi11_5=0;
+%Interações com CHCO
+    %CHCOO
+psi6_7=0;
+psi7_6=0;
+    %CO2
+psi6_8=0;
+psi8_6=0;
+    %IM-Tf2N
+psi6_9=0;
+psi9_6=0;
+    %IM-PF6
+psi6_10=0;
+psi10_6=0;
+    %IM-BF4
+psi6_11=0;
+psi11_6=0;
+%Interações com CHCOO
+    %CO2
+Anm_78=818.72;
+Bnm_78=-3.5627;
+Cnm_78=0;
+Amn_78=-742.2;
+Bmn_78=2.9173;
+Cmn_78=0;
+psi7_8=exp(-(Anm_78+Bnm_78.*Tdata+Cnm_78.*Tdata.^2)/Tdata);
+psi8_7=exp(-(Amn_78+Bmn_78.*Tdata+Cmn_78.*Tdata.^2)/Tdata);
+    %IM-Tf2N
+psi7_9=0;
+psi9_7=0;
+    %IM-PF6
+psi7_10=0;
+psi10_7=0;
+    %IM-BF4
+psi7_11=0;
+psi11_7=0;
+%Interações com CO2
+    %IM-Tf2N
+psi8_9=0;
+psi9_8=0;
+    %IM-PF6
+psi8_10=0;
+psi10_8=0;
+    %IM-BF4
+psi8_11=0;
+psi11_8=0;
+%Interações com IM-Tf2N
+    %IM-PF6
+psi9_10=0;
+psi10_9=0;
+    %IM-BF4
+psi9_11=0;
+psi11_9=0;
+%Interações com IM-PF6
+    %IM-BF4
+psi10_11=0;
+psi11_10=0;
+%Já foram todas
+psi=[1 psi1_2 psi1_3 psi1_4 psi1_5 psi1_6 psi1_7 psi1_8 psi1_9 psi1_10 psi1_11; psi2_1 1 psi2_3 psi2_4 psi2_5 psi2_6 psi2_7 psi2_8 psi2_9 psi2_10 psi2_11; psi3_1 psi3_2 1 psi3_4 psi3_5 psi3_6 psi3_7 psi3_8 psi3_9 psi3_10 psi3_11; psi4_1 psi4_2 psi4_3 1 psi4_5 psi4_6 psi4_7 psi4_8 psi4_9 psi4_10 psi4_11; psi5_1 psi5_2 psi5_3 psi5_4 1 psi5_6 psi5_7 psi5_8 psi5_9 psi5_10 psi5_11; psi6_1 psi6_2 psi6_3 psi6_4 psi6_5 1 psi6_7 psi6_8 psi6_9 psi6_10 psi6_11; psi7_1 psi7_2 psi7_3 psi7_4 psi7_5 psi7_6 1 psi7_8 psi7_9 psi7_10 psi7_11; psi8_1 psi8_2 psi8_3 psi8_4 psi8_5 psi8_6 psi8_7 1 psi8_9 psi8_10 psi8_11; psi9_1 psi9_2 psi9_3 psi9_4 psi9_5 psi9_6 psi9_7 psi9_8 1 psi9_10 psi9_11; psi10_1 psi10_2 psi10_3 psi10_4 psi10_5 psi10_6 psi10_7 psi10_8 psi10_9 1 psi10_11; psi11_1 psi11_2 psi11_3 psi11_4 psi11_5 psi11_6 psi11_7 psi11_8 psi11_9 psi11_10 1];
+for u=1:max(size(g1))
+    for e=1:max(size(g1))
+        h1(u,e)=g1(u).*g2(e);
+        h2(u,e)=g1(u).*g1(e);
+        h3(u,e)=g2(u).*g2(e);
+    end
+end
+h1t=h1';
+h=h1+h1t+h2+h3;
+h_position= h>1;
+h(h_position)=1;
+hpsi=h.*psi;
+%Primeiro número=linha
+%Segundo número=coluna
+for u=1:max(size(x1))
+    Xti=x1(u).*n1+(1-x1(u)).*n2;
+    Xtotal=sum(Xti);
+    XCH3(u)=(x1(u).*n1(1)+(1-x1(u)).*n2(1))/Xtotal;
+    XCH2(u)=(x1(u).*n1(2)+(1-x1(u)).*n2(2))/Xtotal;
+    XCH(u)=(x1(u).*n1(3)+(1-x1(u)).*n2(3))/Xtotal;
+    XCHd(u)=(x1(u).*n1(4)+(1-x1(u)).*n2(4))/Xtotal;
+    XOHp(u)=(x1(u).*n1(5)+(1-x1(u)).*n2(5))/Xtotal;
+    XOHs(u)=(x1(u).*n1(6)+(1-x1(u)).*n2(6))/Xtotal;
+    XCH3OH(u)=(x1(u).*n1(7)+(1-x1(u)).*n2(7))/Xtotal;
+    XH2O(u)=(x1(u).*n1(8)+(1-x1(u)).*n2(8))/Xtotal;
+    XCH3CO(u)=(x1(u).*n1(9)+(1-x1(u)).*n2(9))/Xtotal;
+    XCH2COO(u)=(x1(u).*n1(10)+(1-x1(u)).*n2(10))/Xtotal;
+    XCO2(u)=(x1(u).*n1(11)+(1-x1(u)).*n2(11))/Xtotal;
+    XIM_Tf2N(u)=(x1(u).*n1(12)+(1-x1(u)).*n2(12))/Xtotal;
+    XIM_PF6(u)=(x1(u).*n1(13)+(1-x1(u)).*n2(13))/Xtotal;
+    XIM_BF4(u)=(x1(u).*n1(14)+(1-x1(u)).*n2(14))/Xtotal;
+end
+X1puro=n1/Ng1;
+X2puro=n2/Ng2;
+%Componente 1
+TetaT1=QkCH3.*X1puro(1)+QkCH2.*X1puro(2)+QkCH.*X1puro(3)+QkCHd.*X1puro(4)+QkOHp.*X1puro(5)+QkOHs.*X1puro(6)+QkCH3OH.*X1puro(7)+QkH2O.*X1puro(8)+QkCH3CO.*X1puro(9)+QkCH2COO.*X1puro(10)+QkCO2.*X1puro(11)+QkIM_Tf2N.*X1puro(12)+QkIM_PF6.*X1puro(13)+QkIM_BF4.*X1puro(14);
+TetaT2=QkCH3.*X2puro(1)+QkCH2.*X2puro(2)+QkCH.*X2puro(3)+QkCHd.*X2puro(4)+QkOHp.*X2puro(5)+QkOHs.*X2puro(6)+QkCH3OH.*X2puro(7)+QkH2O.*X2puro(8)+QkCH3CO.*X2puro(9)+QkCH2COO.*X2puro(10)+QkCO2.*X2puro(11)+QkIM_Tf2N.*X2puro(12)+QkIM_PF6.*X2puro(13)+QkIM_BF4.*X2puro(14);
+Teta1CH3=QkCH3.*X1puro(1)/TetaT1;
+Teta1CH2=QkCH2.*X1puro(2)/TetaT1;
+Teta1CH=QkCH.*X1puro(3)/TetaT1;
+Teta1(1)=Teta1CH3+Teta1CH2+Teta1CH;
+Teta1(2)=QkCHd.*X1puro(4)/TetaT1;
+Teta1OHp=QkOHp.*X1puro(5)/TetaT1;
+Teta1OHs=QkOHs.*X1puro(6)/TetaT1;
+Teta1(3)=Teta1OHp+Teta1OHs;
+Teta1(4)=QkCH3OH.*X1puro(7)/TetaT1;
+Teta1(5)=QkH2O.*X1puro(8)/TetaT1;
+Teta1(6)=QkCH3CO.*X1puro(9)/TetaT1;
+Teta1(7)=QkCH2COO.*X1puro(10)/TetaT1;
+Teta1(8)=QkCO2.*X1puro(11)/TetaT1;
+Teta1(9)=QkIM_Tf2N.*X1puro(12)/TetaT1;
+Teta1(10)=QkIM_PF6.*X1puro(13)/TetaT1;
+Teta1(11)=QkIM_BF4.*X1puro(14)/TetaT1;
+%Componente 2
+Teta2CH3=QkCH3.*X2puro(1)/TetaT2;
+Teta2CH2=QkCH2.*X2puro(2)/TetaT2;
+Teta2CH=QkCH.*X2puro(3)/TetaT2;
+Teta2(1)=Teta2CH3+Teta2CH2+Teta2CH;
+Teta2(2)=QkCHd.*X2puro(4)/TetaT2;
+Teta2OHp=QkOHp.*X2puro(5)/TetaT2;
+Teta2OHs=QkOHs.*X2puro(6)/TetaT2;
+Teta2(3)=Teta2OHp+Teta2OHs;
+Teta2(4)=QkCH3OH.*X2puro(7)/TetaT2;
+Teta2(5)=QkH2O.*X2puro(8)/TetaT2;
+Teta2(6)=QkCH3CO.*X2puro(9)/TetaT2;
+Teta2(7)=QkCH2COO.*X2puro(10)/TetaT2;
+Teta2(8)=QkCO2.*X2puro(11)/TetaT2;
+Teta2(9)=QkIM_Tf2N.*X2puro(12)/TetaT2;
+Teta2(10)=QkIM_PF6.*X2puro(13)/TetaT2;
+Teta2(11)=QkIM_BF4.*X2puro(14)/TetaT2;
+for e=1:max(size(g1))
+    PSIrowi=hpsi(:,e);
+    PSIrow=PSIrowi';
+    Soma1_1(e)=sum(Teta1.*PSIrow).*g1(e);
+    Soma1_2(e)=sum(Teta2.*PSIrow).*g2(e); 
+end
+for e=1:max(size(g1))
+    PSIline=hpsi(e,:);
+    J1i=Teta1.*PSIline;
+    J2i=Teta2.*PSIline;
+    J1=J1i./Soma1_1;
+    J2=J2i./Soma1_2;
+    J1N_position= isnan(J1);
+    J1I_position= abs(J1)==Inf;
+    J2N_position= isnan(J2);
+    J2I_position= abs(J2)==Inf;
+    J1(J1N_position)=0;
+    J1(J1I_position)=0;
+    J2(J2N_position)=0;
+    J2(J2I_position)=0;
+    Soma3_1(e)=sum(J1);
+    Soma3_2(e)=sum(J2);
+end
+for e=1:max(size(g1))
+    LnS1(e)=log(Soma1_1(e));
+    LnS2(e)=log(Soma1_2(e));
+end
+LnS1N_position= isnan(LnS1);
+LnS1I_position= abs(LnS1)==Inf;
+LnS1(LnS1N_position)=0;
+LnS1(LnS1I_position)=0;
+LnS2N_position= isnan(LnS2);
+LnS2I_position= abs(LnS2)==Inf;
+LnS2(LnS2N_position)=0;
+LnS2(LnS2I_position)=0;
+%Componente 1
+GueCH3_1=QkCH3.*(1-LnS1(1)-Soma3_1(1)).*g1(1);
+GueCH2_1=QkCH2.*(1-LnS1(1)-Soma3_1(1)).*g1(1);
+GueCH_1=QkCH.*(1-LnS1(1)-Soma3_1(1)).*g1(1);
+GueCHd_1=QkCHd.*(1-LnS1(2)-Soma3_1(2)).*g1(2);
+GueOHp_1=QkOHp.*(1-LnS1(3)-Soma3_1(3)).*g1(3);
+GueOHs_1=QkOHs.*(1-LnS1(3)-Soma3_1(3)).*g1(3);
+GueCH3OH_1=QkCH3OH.*(1-LnS1(4)-Soma3_1(4)).*g1(4);
+GueH2O_1=QkH2O.*(1-LnS1(5)-Soma3_1(5)).*g1(5);
+GueCH3CO_1=QkCH3CO.*(1-LnS1(6)-Soma3_1(6)).*g1(6);
+GueCH2COO_1=QkCH2COO.*(1-LnS1(7)-Soma3_1(7)).*g1(7);
+GueCO2_1=QkCO2.*(1-LnS1(8)-Soma3_1(8)).*g1(8);
+GueIM_Tf2N_1=QkIM_Tf2N.*(1-LnS1(9)-Soma3_1(9)).*g1(9);
+GueIM_PF6_1=QkIM_PF6.*(1-LnS1(10)-Soma3_1(10)).*g1(10);
+GueIM_BF4_1=QkIM_BF4.*(1-LnS1(11)-Soma3_1(11)).*g1(11);
+%Componente 2
+GueCH3_2=QkCH3.*(1-LnS2(1)-Soma3_2(1)).*g2(1);
+GueCH2_2=QkCH2.*(1-LnS2(1)-Soma3_2(1)).*g2(1);
+GueCH_2=QkCH.*(1-LnS2(1)-Soma3_2(1)).*g2(1);
+GueCHd_2=QkCHd.*(1-LnS2(2)-Soma3_2(2)).*g2(2);
+GueOHp_2=QkOHp.*(1-LnS2(3)-Soma3_2(3)).*g2(3);
+GueOHs_2=QkOHs.*(1-LnS2(3)-Soma3_2(3)).*g2(3);
+GueCH3OH_2=QkCH3OH.*(1-LnS2(4)-Soma3_2(4)).*g2(4);
+GueH2O_2=QkH2O.*(1-LnS2(5)-Soma3_2(5)).*g2(5);
+GueCH3CO_2=QkCH3CO.*(1-LnS2(6)-Soma3_2(6)).*g2(6);
+GueCH2COO_2=QkCH2COO.*(1-LnS2(7)-Soma3_2(7)).*g2(7);
+GueCO2_2=QkCO2.*(1-LnS2(8)-Soma3_2(8)).*g2(8);
+GueIM_Tf2N_2=QkIM_Tf2N.*(1-LnS2(9)-Soma3_2(9)).*g2(9);
+GueIM_PF6_2=QkIM_PF6.*(1-LnS2(10)-Soma3_2(10)).*g2(10);
+GueIM_BF4_2=QkIM_BF4.*(1-LnS2(11)-Soma3_2(11)).*g2(11);
+for u=1:max(size(x1))
+    TetaTi=QkCH3.*XCH3(u)+QkCH2.*XCH2(u)+QkCH.*XCH(u)+QkCHd.*XCHd(u)+QkOHp.*XOHp(u)+QkOHs.*XOHs(u)+QkCH3OH.*XCH3OH(u)+QkH2O.*XH2O(u)+QkCH3CO.*XCH3CO(u)+QkCH2COO.*XCH2COO(u)+QkCO2.*XCO2(u)+QkIM_Tf2N.*XIM_Tf2N(u)+QkIM_PF6.*XIM_PF6(u)+QkIM_BF4.*XIM_BF4(u);
+    TetaT=sum(TetaTi);
+    TetaCH3=QkCH3.*XCH3(u)/TetaT;
+    TetaCH2=QkCH2.*XCH2(u)/TetaT;
+    TetaCH=QkCH.*XCH(u)/TetaT;
+    Teta(1)=TetaCH3+TetaCH2+TetaCH;
+    Teta(2)=QkCHd.*XCHd(u)/TetaT;
+    TetaOHp=QkOHp.*XOHp(u)/TetaT;
+    TetaOHs=QkOHs.*XOHs(u)/TetaT;
+    Teta(3)=TetaOHp+TetaOHs;
+    Teta(4)=QkCH3OH.*XCH3OH(u)/TetaT;
+    Teta(5)=QkH2O.*XH2O(u)/TetaT;
+    Teta(6)=QkCH3CO.*XCH3CO(u)/TetaT;
+    Teta(7)=QkCH2COO.*XCH2COO(u)/TetaT;
+    Teta(8)=QkCO2.*XCO2(u)/TetaT;
+    Teta(9)=QkIM_Tf2N.*XIM_Tf2N(u)/TetaT;
+    Teta(10)=QkIM_PF6.*XIM_PF6(u)/TetaT;
+    Teta(11)=QkIM_BF4.*XIM_BF4(u)/TetaT;
+    for e=1:max(size(g1))
+        PSIrowi=hpsi(:,e);
+        PSIrow=PSIrowi';
+        Soma1(e)=sum(Teta.*PSIrow);
+    end
+    for e=1:max(size(g1))
+        PSIrowi=hpsi(:,e);
+        PSIrow=PSIrowi';
+        PSIline=hpsi(e,:);
+        Ji=Teta.*PSIline;
+        J=Ji./Soma1;
+        JN_position= isnan(J);
+        JI_position= abs(J)==Inf;
+        J(JN_position)=0;
+        J(JI_position)=0;
+        Soma3(e)=sum(J);
+    end
+    for e=1:max(size(g1))
+        LnS(e)=log(Soma1(e));
+    end
+    LnSN_position= isnan(LnS);
+    LnSI_position= abs(LnS)==Inf;
+    LnS(LnSN_position)=0;
+    LnS(LnSI_position)=0;
+    GueCH3=QkCH3.*(1-LnS(1)-Soma3(1));
+    GueCH2=QkCH2.*(1-LnS(1)-Soma3(1));
+    GueCH=QkCH.*(1-LnS(1)-Soma3(1));
+    GueCHd=QkCHd.*(1-LnS(2)-Soma3(2));
+    GueOHp=QkOHp.*(1-LnS(3)-Soma3(3));
+    GueOHs=QkOHs.*(1-LnS(3)-Soma3(3));
+    GueCH3OH=QkCH3OH.*(1-LnS(4)-Soma3(4));
+    GueH2O=QkH2O.*(1-LnS(5)-Soma3(5));
+    GueCH3CO=QkCH3CO.*(1-LnS(6)-Soma3(6));
+    GueCH2COO=QkCH2COO.*(1-LnS(7)-Soma3(7));
+    GueCO2=QkCO2.*(1-LnS(8)-Soma3(8));
+    GueIM_Tf2N=QkIM_Tf2N.*(1-LnS(9)-Soma3(9));
+    GueIM_PF6=QkIM_PF6.*(1-LnS(10)-Soma3(10));
+    GueIM_BF4=QkIM_BF4.*(1-LnS(11)-Soma3(11));
+    ln_gamma1=n1(1).*(GueCH3-GueCH3_1)+n1(2).*(GueCH2-GueCH2_1)+n1(3).*(GueCH-GueCH_1)+n1(4).*(GueCHd-GueCHd_1)+n1(5).*(GueOHp-GueOHp_1)+n1(6).*(GueOHs-GueOHs_1)+n1(7).*(GueCH3OH-GueCH3OH_1)+n1(8).*(GueH2O-GueH2O_1)+n1(9).*(GueCH3CO-GueCH3CO_1)+n1(10).*(GueCH2COO-GueCH2COO_1)+n1(11).*(GueCO2-GueCO2_1)+n1(12).*(GueIM_Tf2N-GueIM_Tf2N_1)+n1(13).*(GueIM_PF6-GueIM_PF6_1)+n1(14).*(GueIM_BF4-GueIM_BF4_1);
+    ln_gamma2=n2(1).*(GueCH3-GueCH3_2)+n2(2).*(GueCH2-GueCH2_2)+n2(3).*(GueCH-GueCH_2)+n2(4).*(GueCHd-GueCHd_2)+n2(5).*(GueOHp-GueOHp_2)+n2(6).*(GueOHs-GueOHs_2)+n2(7).*(GueCH3OH-GueCH3OH_2)+n2(8).*(GueH2O-GueH2O_2)+n2(9).*(GueCH3CO-GueCH3CO_2)+n2(10).*(GueCH2COO-GueCH2COO_2)+n2(11).*(GueCO2-GueCO2_2)+n2(12).*(GueIM_Tf2N-GueIM_Tf2N_2)+n2(13).*(GueIM_PF6-GueIM_PF6_2)+n2(14).*(GueIM_BF4-GueIM_BF4_2);
+    gamma1R_l=exp(ln_gamma1);
+    gamma2R_l=exp(ln_gamma2);
+    Gm1R_l(u)=gamma1R_l;
+    Gm2R_l(u)=gamma2R_l;
+    Ge1_l(u)=R.*Tdata.*log(gamma1R_l);
+    Ge2_l(u)=R.*Tdata.*log(gamma2R_l);
+    %Vi e Fi
+    V1=r1/(x1(u).*r1+(1-x1(u)).*r2);
+    V2=r2/(x1(u).*r1+(1-x1(u)).*r2);
+    %V1i=r1^(3/4)/(x1s(u).*r1^(3/4)+(1-x1s(u)).*r2^(3/4));
+    %V2i=r2^(3/4)/(x1s(u).*r1^(3/4)+(1-x1s(u)).*r2^(3/4));
+    F1=q1/(x1(u).*q1+(1-x1(u)).*q2);
+    F2=q2/(x1(u).*q1+(1-x1(u)).*q2);
+    ln_gmC1=1-V1+log(V1)-5.*q1.*(1-V1/F1+log(V1/F1));
+    ln_gmC2=1-V2+log(V2)-5.*q2.*(1-V2/F2+log(V2/F2));
+    gamma1C_l=exp(ln_gmC1);
+    gamma2C_l=exp(ln_gmC2);
+    %Coeficientes de atividade reais
+    gamma1(u)=exp(log(gamma1C_l)+log(gamma1R_l));
+    gamma2(u)=exp(log(gamma2C_l)+log(gamma2R_l));
+end
